@@ -11,15 +11,17 @@
 #include "EGL/egl.h"
 #include "EGL/eglext.h"
 
-#define LCD 0
+#define SCREEN_LCD 0
+
+struct EGL_State {
+	EGLDisplay display;
+	EGLSurface surface;
+	EGLContext context;
+} egl_state;
 
 typedef struct {
 	uint32_t screen_width;
 	uint32_t screen_height;
-
-	EGLDisplay display;
-	EGLSurface surface;
-	EGLContext context;
 
 	GLuint program;
 	GLuint buf;
@@ -78,47 +80,47 @@ static void init_opengl(GLOBAL_T *state) {
 	};
 
 	// get an EGL display connection
-	state->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-	if(state->display == EGL_NO_DISPLAY) {
+	egl_state.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	if(egl_state.display == EGL_NO_DISPLAY) {
 		fprintf(stderr, "Failed to get EGL display! Error: %s\n", eglGetErrorStr());
 		exit(EXIT_FAILURE);
 	}
 
 	// initialize the EGL display connection
-	if (eglInitialize(state->display, &major, &minor) == EGL_FALSE) {
+	if (eglInitialize(egl_state.display, &major, &minor) == EGL_FALSE) {
 		fprintf(stderr, "Failed to get EGL version! Error: %s\n", eglGetErrorStr());
-		eglTerminate(state->display);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 
 	printf("Initialized EGL version: %d.%d\n", major, minor);
 
 	// get an appropriate EGL frame buffer configuration
-	if(eglChooseConfig(state->display, attribute_list, &config, 1, &num_config) == EGL_FALSE) {
+	if(eglChooseConfig(egl_state.display, attribute_list, &config, 1, &num_config) == EGL_FALSE) {
 		fprintf(stderr, "Failed to get EGL Config! Error: %s\n", eglGetErrorStr());
-		eglTerminate(state->display);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 
 	// get an appropriate EGL frame buffer configuration
 	if(eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE) {
 		fprintf(stderr, "Failed to bind OpenGL API! Error: %s\n", eglGetErrorStr());
-		eglTerminate(state->display);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 
 	// create an EGL rendering context
-	state->context = eglCreateContext(state->display, config, EGL_NO_CONTEXT, context_attributes);
-	if(state->context == EGL_NO_CONTEXT) {
+	egl_state.context = eglCreateContext(egl_state.display, config, EGL_NO_CONTEXT, context_attributes);
+	if(egl_state.context == EGL_NO_CONTEXT) {
 		fprintf(stderr, "Failed to get EGL Context! Error: %s\n", eglGetErrorStr());
-		eglTerminate(state->display);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 
 	// create an EGL window surface
-	if(graphics_get_display_size(LCD, &state->screen_width, &state->screen_height) < 0) {
+	if(graphics_get_display_size(SCREEN_LCD, &state->screen_width, &state->screen_height) < 0) {
 		fprintf(stderr, "Failed to get display size!\n");
-		eglTerminate(state->display);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 
@@ -132,7 +134,7 @@ static void init_opengl(GLOBAL_T *state) {
 	src_rect.width = state->screen_width;
 	src_rect.height = state->screen_height;
 
-	dispman_display = vc_dispmanx_display_open(LCD);
+	dispman_display = vc_dispmanx_display_open(SCREEN_LCD);
 	dispman_update = vc_dispmanx_update_start( 0 );
 			
 	dispman_element = vc_dispmanx_element_add ( 
@@ -153,18 +155,18 @@ static void init_opengl(GLOBAL_T *state) {
 	nativewindow.height = state->screen_height;
 	vc_dispmanx_update_submit_sync( dispman_update );
 
-	state->surface = eglCreateWindowSurface( state->display, config, &nativewindow, NULL );
-	if(state->surface == EGL_NO_SURFACE) {
+	egl_state.surface = eglCreateWindowSurface( egl_state.display, config, &nativewindow, NULL );
+	if(egl_state.surface == EGL_NO_SURFACE) {
 		fprintf(stderr, "Failed to create surface! Error: %s\n", eglGetErrorStr());
-		eglTerminate(state->display);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 
 	// connect the context to the surface
-	if(eglMakeCurrent(state->display, state->surface, state->surface, state->context) == EGL_FALSE) {
+	if(eglMakeCurrent(egl_state.display, egl_state.surface, egl_state.surface, egl_state.context) == EGL_FALSE) {
 		fprintf(stderr, "Failed to make current! Error: %s\n", eglGetErrorStr());
-		eglDestroySurface(state->display, state->surface);
-		eglTerminate(state->display);
+		eglDestroySurface(egl_state.display, egl_state.surface);
+		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
 	}
 	
@@ -230,7 +232,7 @@ static void draw_triangles(GLOBAL_T *state) {
 
 	glFlush();
 	glFinish();
-	eglSwapBuffers(state->display, state->surface);
+	eglSwapBuffers(egl_state.display, egl_state.surface);
 
 }
 
