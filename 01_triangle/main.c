@@ -17,11 +17,11 @@ struct EGL_State {
 	EGLDisplay display;
 	EGLSurface surface;
 	EGLContext context;
+	uint32_t screen_width;
+	uint32_t screen_height;
 } egl_state;
 
 typedef struct {
-	uint32_t screen_width;
-	uint32_t screen_height;
 
 	GLuint program;
 	GLuint buf;
@@ -118,7 +118,7 @@ static void init_opengl(GLOBAL_T *state) {
 	}
 
 	// create an EGL window surface
-	if(graphics_get_display_size(SCREEN_LCD, &state->screen_width, &state->screen_height) < 0) {
+	if(graphics_get_display_size(SCREEN_LCD, &egl_state.screen_width, &egl_state.screen_height) < 0) {
 		fprintf(stderr, "Failed to get display size!\n");
 		eglTerminate(egl_state.display);
 		exit(EXIT_FAILURE);
@@ -126,13 +126,13 @@ static void init_opengl(GLOBAL_T *state) {
 
 	dst_rect.x = 0;
 	dst_rect.y = 0;
-	dst_rect.width = state->screen_width;
-	dst_rect.height = state->screen_height;
+	dst_rect.width = egl_state.screen_width;
+	dst_rect.height = egl_state.screen_height;
 		
 	src_rect.x = 0;
 	src_rect.y = 0;
-	src_rect.width = state->screen_width;
-	src_rect.height = state->screen_height;
+	src_rect.width = egl_state.screen_width;
+	src_rect.height = egl_state.screen_height;
 
 	dispman_display = vc_dispmanx_display_open(SCREEN_LCD);
 	dispman_update = vc_dispmanx_update_start( 0 );
@@ -151,8 +151,8 @@ static void init_opengl(GLOBAL_T *state) {
 	);
 		
 	nativewindow.element = dispman_element;
-	nativewindow.width = state->screen_width;
-	nativewindow.height = state->screen_height;
+	nativewindow.width = egl_state.screen_width;
+	nativewindow.height = egl_state.screen_height;
 	vc_dispmanx_update_submit_sync( dispman_update );
 
 	egl_state.surface = eglCreateWindowSurface( egl_state.display, config, &nativewindow, NULL );
@@ -210,7 +210,7 @@ static void init_shaders(GLOBAL_T *state) {
 	glGenBuffers(1, &state->buf);
 
 	// Prepare viewport
-	glViewport ( 0, 0, state->screen_width, state->screen_height );
+	glViewport ( 0, 0, egl_state.screen_width, egl_state.screen_height );
 	glClearColor ( 0.0, 0.0, 0.0, 1.0 );
 		  
 	// Upload vertex data to a buffer
