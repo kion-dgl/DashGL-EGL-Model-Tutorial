@@ -5,3 +5,4 @@
 void InitGraphics();
 void updateScreen();
 void setViewport();
+static const char *eglGetErrorStr();
