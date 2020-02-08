@@ -11,24 +11,24 @@
 #include "EGL/egl.h"
 #include "EGL/eglext.h"
 
-#define SCREEN_LCD 0
+#define LCD 0
 
-struct EGL_State {
+typedef struct {
+	uint32_t screen_width;
+	uint32_t screen_height;
+
 	EGLDisplay display;
 	EGLSurface surface;
 	EGLContext context;
-	uint32_t screen_width;
-	uint32_t screen_height;
-} egl_state;
-
-typedef struct {
 
 	GLuint program;
 	GLuint buf;
+	GLuint vshader;
+	GLuint fshader;
 	GLuint attr_vertex; 
 } GLOBAL_T;
 
-static void init_opengl(GLOBAL_T *state);
+static void init_ogl(GLOBAL_T *state);
 static void init_shaders(GLOBAL_T *state);
 static void draw_triangles(GLOBAL_T *state);
 static const char *eglGetErrorStr();
@@ -43,7 +43,7 @@ int main () {
 	memset( &state, 0, sizeof( GLOBAL_T ) );
 		
 	// Start OGLES
-	init_opengl(&state);
+	init_ogl(&state);
 	init_shaders(&state);
 
 	while (!terminate) {
@@ -53,7 +53,7 @@ int main () {
 	return 0;
 }
 
-static void init_opengl(GLOBAL_T *state) {
+static void init_ogl(GLOBAL_T *state) {
 
 	int major, minor;
 	EGLint num_config;
@@ -80,61 +80,61 @@ static void init_opengl(GLOBAL_T *state) {
 	};
 
 	// get an EGL display connection
-	egl_state.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-	if(egl_state.display == EGL_NO_DISPLAY) {
+	state->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	if(state->display == EGL_NO_DISPLAY) {
 		fprintf(stderr, "Failed to get EGL display! Error: %s\n", eglGetErrorStr());
 		exit(EXIT_FAILURE);
 	}
 
 	// initialize the EGL display connection
-	if (eglInitialize(egl_state.display, &major, &minor) == EGL_FALSE) {
+	if (eglInitialize(state->display, &major, &minor) == EGL_FALSE) {
 		fprintf(stderr, "Failed to get EGL version! Error: %s\n", eglGetErrorStr());
-		eglTerminate(egl_state.display);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 
 	printf("Initialized EGL version: %d.%d\n", major, minor);
 
 	// get an appropriate EGL frame buffer configuration
-	if(eglChooseConfig(egl_state.display, attribute_list, &config, 1, &num_config) == EGL_FALSE) {
+	if(eglChooseConfig(state->display, attribute_list, &config, 1, &num_config) == EGL_FALSE) {
 		fprintf(stderr, "Failed to get EGL Config! Error: %s\n", eglGetErrorStr());
-		eglTerminate(egl_state.display);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 
 	// get an appropriate EGL frame buffer configuration
 	if(eglBindAPI(EGL_OPENGL_ES_API) == EGL_FALSE) {
 		fprintf(stderr, "Failed to bind OpenGL API! Error: %s\n", eglGetErrorStr());
-		eglTerminate(egl_state.display);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 
 	// create an EGL rendering context
-	egl_state.context = eglCreateContext(egl_state.display, config, EGL_NO_CONTEXT, context_attributes);
-	if(egl_state.context == EGL_NO_CONTEXT) {
+	state->context = eglCreateContext(state->display, config, EGL_NO_CONTEXT, context_attributes);
+	if(state->context == EGL_NO_CONTEXT) {
 		fprintf(stderr, "Failed to get EGL Context! Error: %s\n", eglGetErrorStr());
-		eglTerminate(egl_state.display);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 
 	// create an EGL window surface
-	if(graphics_get_display_size(SCREEN_LCD, &egl_state.screen_width, &egl_state.screen_height) < 0) {
+	if(graphics_get_display_size(LCD, &state->screen_width, &state->screen_height) < 0) {
 		fprintf(stderr, "Failed to get display size!\n");
-		eglTerminate(egl_state.display);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 
 	dst_rect.x = 0;
 	dst_rect.y = 0;
-	dst_rect.width = egl_state.screen_width;
-	dst_rect.height = egl_state.screen_height;
+	dst_rect.width = state->screen_width;
+	dst_rect.height = state->screen_height;
 		
 	src_rect.x = 0;
 	src_rect.y = 0;
-	src_rect.width = egl_state.screen_width;
-	src_rect.height = egl_state.screen_height;
+	src_rect.width = state->screen_width;
+	src_rect.height = state->screen_height;
 
-	dispman_display = vc_dispmanx_display_open(SCREEN_LCD);
+	dispman_display = vc_dispmanx_display_open(LCD);
 	dispman_update = vc_dispmanx_update_start( 0 );
 			
 	dispman_element = vc_dispmanx_element_add ( 
@@ -151,22 +151,22 @@ static void init_opengl(GLOBAL_T *state) {
 	);
 		
 	nativewindow.element = dispman_element;
-	nativewindow.width = egl_state.screen_width;
-	nativewindow.height = egl_state.screen_height;
+	nativewindow.width = state->screen_width;
+	nativewindow.height = state->screen_height;
 	vc_dispmanx_update_submit_sync( dispman_update );
 
-	egl_state.surface = eglCreateWindowSurface( egl_state.display, config, &nativewindow, NULL );
-	if(egl_state.surface == EGL_NO_SURFACE) {
+	state->surface = eglCreateWindowSurface( state->display, config, &nativewindow, NULL );
+	if(state->surface == EGL_NO_SURFACE) {
 		fprintf(stderr, "Failed to create surface! Error: %s\n", eglGetErrorStr());
-		eglTerminate(egl_state.display);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 
 	// connect the context to the surface
-	if(eglMakeCurrent(egl_state.display, egl_state.surface, egl_state.surface, egl_state.context) == EGL_FALSE) {
+	if(eglMakeCurrent(state->display, state->surface, state->surface, state->context) == EGL_FALSE) {
 		fprintf(stderr, "Failed to make current! Error: %s\n", eglGetErrorStr());
-		eglDestroySurface(egl_state.display, egl_state.surface);
-		eglTerminate(egl_state.display);
+		eglDestroySurface(state->display, state->surface);
+		eglTerminate(state->display);
 		exit(EXIT_FAILURE);
 	}
 	
@@ -193,24 +193,24 @@ static void init_shaders(GLOBAL_T *state) {
 		"  gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);"
 		"}";
 
-	GLuint vshader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vshader, 1, &vshader_source, 0);
-	glCompileShader(vshader);
+	state->vshader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(state->vshader, 1, &vshader_source, 0);
+	glCompileShader(state->vshader);
 
-	GLuint fshader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fshader, 1, &fshader_source, 0);
-	glCompileShader(fshader);
+	state->fshader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(state->fshader, 1, &fshader_source, 0);
+	glCompileShader(state->fshader);
 
 	state->program = glCreateProgram();
-	glAttachShader(state->program, vshader);
-	glAttachShader(state->program, fshader);
+	glAttachShader(state->program, state->vshader);
+	glAttachShader(state->program, state->fshader);
 	glLinkProgram(state->program);
 
 	state->attr_vertex = glGetAttribLocation(state->program, "vertex");
 	glGenBuffers(1, &state->buf);
 
 	// Prepare viewport
-	glViewport ( 0, 0, egl_state.screen_width, egl_state.screen_height );
+	glViewport ( 0, 0, state->screen_width, state->screen_height );
 	glClearColor ( 0.0, 0.0, 0.0, 1.0 );
 		  
 	// Upload vertex data to a buffer
@@ -232,7 +232,7 @@ static void draw_triangles(GLOBAL_T *state) {
 
 	glFlush();
 	glFinish();
-	eglSwapBuffers(egl_state.display, egl_state.surface);
+	eglSwapBuffers(state->display, state->surface);
 
 }
 
