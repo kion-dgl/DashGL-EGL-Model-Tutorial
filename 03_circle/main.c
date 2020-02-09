@@ -18,8 +18,6 @@
 typedef struct {
 	GLuint program;
 	GLuint buf;
-	GLuint vshader;
-	GLuint fshader;
 	GLuint attr_vertex; 
 } GLOBAL_T;
 
@@ -48,7 +46,39 @@ int main () {
 }
 
 static void init_shaders(GLOBAL_T *state) {
+	
+	int i, k;
+	const int num_segments = 10;
+	float a, b;
 
+	GLfloat *circle_data;
+	circle_data = malloc(num_segments * sizeof(GLfloat) * 9);
+	memset( circle_data, 0, sizeof( circle_data) );
+
+	for(i = 0; i < num_segments; i++) {
+		a = i * 2.0f * M_PI / num_segments;
+		b = (i+1) * 2.0f * M_PI / num_segments;
+
+		circle_data[i*9+0] = cos(a);
+		circle_data[i*9+1] = sin(a);
+		circle_data[i*9+2] = 1.0f;
+
+		circle_data[i*9+3] = 0;
+		circle_data[i*9+4] = 0;
+		circle_data[i*9+5] = 1.0f;
+
+		circle_data[i*9+6] = cos(b);
+		circle_data[i*9+7] = sin(b);
+		circle_data[i*9+8] = 1.0f;
+
+		printf("%.02f, %.02f, %.02f, \n", circle_data[i*9+0], circle_data[i*9+1], circle_data[i*9+2]);
+		printf("%.02f, %.02f, %.02f, \n", circle_data[i*9+3], circle_data[i*9+4], circle_data[i*9+5]);
+		printf("%.02f, %.02f, %.02f, \n", circle_data[i*9+6], circle_data[i*9+7], circle_data[i*9+8]);
+
+	}
+	
+
+	/*
 	static const GLfloat vertex_data[] = {
 		  -0.8, -0.8, 1.0,
 		   0.8, -0.8, 1.0,
@@ -58,32 +88,19 @@ static void init_shaders(GLOBAL_T *state) {
 		   0.8,  0.8, 1.0,
 		  -0.8,  0.8, 1.0
 	};
-
-	/*
-	const GLchar *vshader_source =
-		"attribute vec3 vertex;"
-		"void main(void) {"
-		"	gl_Position = vec4(vertex, 1.0);"
-		"}";
-		
-	const GLchar *fshader_source =
-		"void main(void) {"
-		"  gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);"
-		"}";
-
-	state->vshader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(state->vshader, 1, &vshader_source, 0);
-	glCompileShader(state->vshader);
-
-	state->fshader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(state->fshader, 1, &fshader_source, 0);
-	glCompileShader(state->fshader);
-
-	state->program = glCreateProgram();
-	glAttachShader(state->program, state->vshader);
-	glAttachShader(state->program, state->fshader);
-	glLinkProgram(state->program);
 	*/
+
+	static const GLfloat vertex_data[] = {
+		   1.0,  0.0, 1.0,
+		   0.0,  0.0, 1.0,
+		   0.81,  0.59, 1.0,
+
+		   0.81, 0.59, 1.0,
+		   0.0,  0.0, 1.0,
+		  0.31,  0.95, 1.0
+	};
+	
+	printf("Size: %d\n", sizeof(circle_data));
 
 	state->attr_vertex = glGetAttribLocation(state->program, "vertex");
 	glGenBuffers(1, &state->buf);
@@ -93,10 +110,12 @@ static void init_shaders(GLOBAL_T *state) {
 		  
 	// Upload vertex data to a buffer
 	glBindBuffer(GL_ARRAY_BUFFER, state->buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, num_segments * sizeof(GLfloat) * 9, circle_data, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(state->attr_vertex, 3, GL_FLOAT, 0, 12, 0);
 	glEnableVertexAttribArray(state->attr_vertex);
+	free(circle_data);
 
 }
 
@@ -106,7 +125,7 @@ static void draw_triangles(GLOBAL_T *state) {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glBindBuffer(GL_ARRAY_BUFFER, state->buf);
 	glUseProgram ( state->program );
-	glDrawArrays ( GL_TRIANGLES, 0, 6 );
+	glDrawArrays ( GL_TRIANGLES, 0, 3 * 10 );
 
 	glFlush();
 	glFinish();
