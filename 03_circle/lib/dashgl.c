@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include "bcm_host.h"
-#include "startScreen.h"
+#include "dashgl.h"
 
 #define check() assert(glGetError() == 0)
 
@@ -16,8 +16,8 @@ EGLDisplay GDisplay;
 EGLSurface GSurface;
 EGLContext GContext;
 
-void InitGraphics()
-{
+void dgl_init_graphics() {
+
 	bcm_host_init();
 	int32_t success = 0;
 	EGLBoolean result;
@@ -31,8 +31,7 @@ void InitGraphics()
 	VC_RECT_T dst_rect;
 	VC_RECT_T src_rect;
 
-	static const EGLint attribute_list[] =
-	{
+	static const EGLint attribute_list[] = {
 		EGL_RED_SIZE, 8,
 		EGL_GREEN_SIZE, 8,
 		EGL_BLUE_SIZE, 8,
@@ -42,8 +41,7 @@ void InitGraphics()
 		EGL_NONE
 	};
 
-	static const EGLint context_attributes[] = 
-	{
+	static const EGLint context_attributes[] = {
 		EGL_CONTEXT_CLIENT_VERSION, 2,
 		EGL_NONE
 	};
@@ -115,17 +113,16 @@ void InitGraphics()
 	glClearColor(0.15f, 0.25f, 0.35f, 1.0f);
 	glClear( GL_COLOR_BUFFER_BIT );
 
-   glViewport ( 0, 0, GScreenWidth, GScreenHeight );
-
-   check();
+	glViewport ( 0, 0, GScreenWidth, GScreenHeight );
+	check();
 
 }
 
-void updateScreen() {
+void dgl_update_screen() {
    eglSwapBuffers(GDisplay,GSurface);
 }
 
-void setViewport() {
+void dgl_set_viewport() {
    glViewport ( 0, 0, GScreenWidth, GScreenHeight );
 }
 

@@ -2,9 +2,9 @@
 #include "EGL/egl.h"
 #include "EGL/eglext.h"
 
-void InitGraphics();
-void updateScreen();
-void setViewport();
+void dgl_init_graphics();
+void dgl_update_screen();
+void dgl_set_viewport();
 static const char *eglGetErrorStr();
 
 GLuint dgl_create_shader(const char *filename, GLenum type);
