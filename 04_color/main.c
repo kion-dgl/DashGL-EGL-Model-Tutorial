@@ -17,8 +17,9 @@
 
 typedef struct {
 	GLuint program;
-	GLuint buf;
-	GLuint attr_vertex; 
+	GLuint triangle;
+	GLuint attr_coord; 
+	GLuint attr_color; 
 } GLOBAL_T;
 
 static void init_buffers(GLOBAL_T *state);
@@ -47,41 +48,32 @@ int main () {
 
 static void init_buffers(GLOBAL_T *state) {
 	
-	int i, k;
-	const int num_segments = 10;
-	float a, b;
-
-	GLfloat *circle_data;
-	circle_data = malloc(num_segments * sizeof(GLfloat) * 9);
-	memset( circle_data, 0, sizeof( circle_data) );
-
-	for(i = 0; i < num_segments; i++) {
-		a = i * 2.0f * M_PI / num_segments;
-		b = (i+1) * 2.0f * M_PI / num_segments;
-
-		circle_data[i*9+0] = cos(a);
-		circle_data[i*9+1] = sin(a);
-		circle_data[i*9+2] = 1.0f;
-
-		circle_data[i*9+3] = 0;
-		circle_data[i*9+4] = 0;
-		circle_data[i*9+5] = 1.0f;
-
-		circle_data[i*9+6] = cos(b);
-		circle_data[i*9+7] = sin(b);
-		circle_data[i*9+8] = 1.0f;
-	}
+	static const GLfloat vertex_data[] = {
+		0.0,  0.5, 0.0, 0.0, 1.0,
+		-0.5, -0.5, 0.0, 0.0, 1.0,
+		0.5, -0.5, 0.0, 0.0, 1.0
+	};
 	
-	state->attr_vertex = glGetAttribLocation(state->program, "vertex");
-	glGenBuffers(1, &state->buf);
+	glGenBuffers(1, &state->triangle);
+	glBindBuffer(GL_ARRAY_BUFFER, state->triangle);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
 
-	// Upload vertex data to a buffer
-	glBindBuffer(GL_ARRAY_BUFFER, state->buf);
-	glBufferData(GL_ARRAY_BUFFER, num_segments * sizeof(GLfloat) * 9, circle_data, GL_STATIC_DRAW);
+	const char *attribute_name = "coord2d";
+	state->attr_coord = glGetAttribLocation(state->program, attribute_name);
+	if(state->attr_coord == -1) {
+		fprintf(stderr, "Could not bind attribute %s\n", attribute_name);
+		return;
+	}
 
-	glVertexAttribPointer(state->attr_vertex, 3, GL_FLOAT, 0, 12, 0);
-	glEnableVertexAttribArray(state->attr_vertex);
-	free(circle_data);
+	attribute_name = "v_color";
+	state->attr_color = glGetAttribLocation(state->program, attribute_name);
+	if(state->attr_color == -1) {
+		fprintf(stderr, "Could not bind attribute %s\n", attribute_name);
+		return;
+	}
+
+	glEnableVertexAttribArray(state->attr_coord);
+	glEnableVertexAttribArray(state->attr_color);
 
 }
 
@@ -89,9 +81,28 @@ static void draw_triangles(GLOBAL_T *state) {
 	
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glBindBuffer(GL_ARRAY_BUFFER, state->buf);
+	glBindBuffer(GL_ARRAY_BUFFER, state->triangle);
 	glUseProgram ( state->program );
-	glDrawArrays ( GL_TRIANGLES, 0, 3 * 10 );
+
+    glVertexAttribPointer(
+        state->attr_coord,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        0
+    );
+
+    glVertexAttribPointer(
+        state->attr_color,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        (void*)(sizeof(float) * 2)
+    );
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glFlush();
 	glFinish();
