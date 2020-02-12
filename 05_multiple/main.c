@@ -78,6 +78,44 @@ static void init_buffers(GLOBAL_T *state) {
 	glBindBuffer(GL_ARRAY_BUFFER, state->square);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(square_data), square_data, GL_STATIC_DRAW);
 	
+	// Bind Circle
+
+	int i;
+	const int num_segments = 10;
+	float a, b;
+	GLfloat *circle_data;
+	circle_data = malloc(num_segments * sizeof(GLfloat) * 12);
+	memset( circle_data, 0, sizeof( circle_data) );
+
+	for(i = 0; i < num_segments; i++) {
+
+		a = i * 2.0f * M_PI / num_segments;
+		b = (i+1) * 2.0f * M_PI / num_segments;
+
+		circle_data[i*12+0] = cos(a)*0.5 + 0.5;
+		circle_data[i*12+1] = sin(a)*0.5 - 0.5;
+		circle_data[i*12+2] = 1.0f;
+
+		circle_data[i*12+3] = 0.5;
+		circle_data[i*12+4] = -0.5;
+		circle_data[i*12+5] = 1.0f;
+
+		circle_data[i*12+6] = cos(b)*0.5 + 0.5;
+		circle_data[i*12+7] = sin(b)*0.5 - 0.5;
+		circle_data[i*12+8] = 1.0f;
+
+		circle_data[i*12+9] = 1.0f;
+		circle_data[i*12+10] = 0.0f;
+		circle_data[i*12+11] = 0.0f;
+
+		printf("Segment: %d\n", i);
+	}
+	
+	glGenBuffers(1, &state->circle);
+	glBindBuffer(GL_ARRAY_BUFFER, state->circle);
+	glBufferData(GL_ARRAY_BUFFER, num_segments * sizeof(GLfloat) * 12, circle_data, GL_STATIC_DRAW);
+	free(circle_data);
+
 	// Locate Attributes
 
 	const char *attribute_name = "coord2d";
@@ -126,7 +164,7 @@ static void draw_triangles(GLOBAL_T *state) {
     );
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
-
+	
 	glBindBuffer(GL_ARRAY_BUFFER, state->square);
 	glUseProgram ( state->program );
 
@@ -149,6 +187,29 @@ static void draw_triangles(GLOBAL_T *state) {
     );
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, state->circle);
+	glUseProgram ( state->program );
+
+    glVertexAttribPointer(
+        state->attr_coord,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        0
+    );
+
+    glVertexAttribPointer(
+        state->attr_color,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        (void*)(sizeof(float) * 2)
+    );
+
+    glDrawArrays(GL_TRIANGLES, 0, 3 * 10);
 
 	glFlush();
 	glFinish();
