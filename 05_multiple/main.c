@@ -20,6 +20,7 @@ typedef struct {
 	GLuint triangle;
 	GLuint square;
 	GLuint circle;
+	GLuint hexagon;
 	GLuint attr_coord; 
 	GLuint attr_color; 
 } GLOBAL_T;
@@ -84,7 +85,7 @@ static void init_buffers(GLOBAL_T *state) {
 	const int num_segments = 10;
 	float a, b;
 	GLfloat *circle_data;
-	circle_data = malloc(num_segments * sizeof(GLfloat) * 12);
+	circle_data = malloc(num_segments * sizeof(GLfloat) * 15);
 	memset( circle_data, 0, sizeof( circle_data) );
 
 	for(i = 0; i < num_segments; i++) {
@@ -92,28 +93,76 @@ static void init_buffers(GLOBAL_T *state) {
 		a = i * 2.0f * M_PI / num_segments;
 		b = (i+1) * 2.0f * M_PI / num_segments;
 
-		circle_data[i*12+0] = cos(a)*0.5 + 0.5;
-		circle_data[i*12+1] = sin(a)*0.5 - 0.5;
-		circle_data[i*12+2] = 1.0f;
+		// A
 
-		circle_data[i*12+3] = 0.5;
-		circle_data[i*12+4] = -0.5;
-		circle_data[i*12+5] = 1.0f;
+		circle_data[i*15+0] = cos(a)*0.5 + 0.5;
+		circle_data[i*15+1] = sin(a)*0.5 - 0.5;
+		circle_data[i*15+2] = 1.0f;
+		circle_data[i*15+3] = 0.0f;
+		circle_data[i*15+4] = 0.0f;
+		
+		// B
 
-		circle_data[i*12+6] = cos(b)*0.5 + 0.5;
-		circle_data[i*12+7] = sin(b)*0.5 - 0.5;
-		circle_data[i*12+8] = 1.0f;
+		circle_data[i*15+5] = 0.5;
+		circle_data[i*15+6] = -0.5;
+		circle_data[i*15+7] = 1.0f;
+		circle_data[i*15+8] = 0.0f;
+		circle_data[i*15+9] = 0.0f;
 
-		circle_data[i*12+9] = 1.0f;
-		circle_data[i*12+10] = 0.0f;
-		circle_data[i*12+11] = 0.0f;
+		// C
+
+		circle_data[i*15+10] = cos(b)*0.5 + 0.5;
+		circle_data[i*15+11] = sin(b)*0.5 - 0.5;
+		circle_data[i*15+12] = 1.0f;
+		circle_data[i*15+13] = 0.0f;
+		circle_data[i*15+14] = 0.0f;
 
 		printf("Segment: %d\n", i);
 	}
 	
 	glGenBuffers(1, &state->circle);
 	glBindBuffer(GL_ARRAY_BUFFER, state->circle);
-	glBufferData(GL_ARRAY_BUFFER, num_segments * sizeof(GLfloat) * 12, circle_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, num_segments * sizeof(GLfloat) * 15, circle_data, GL_STATIC_DRAW);
+
+	// Bind Hexagon
+	
+	for(i = 0; i < 6; i++) {
+
+		a = i * 2.0f * M_PI / 6;
+		b = (i+1) * 2.0f * M_PI / 6;
+
+		// A
+
+		circle_data[i*15+0] = cos(a)*0.5 - 0.5;
+		circle_data[i*15+1] = sin(a)*0.5 - 0.5;
+		circle_data[i*15+2] = 0.0f;
+		circle_data[i*15+3] = 1.0f;
+		circle_data[i*15+4] = 0.0f;
+		
+		// B
+
+		circle_data[i*15+5] = -0.5;
+		circle_data[i*15+6] = -0.5;
+		circle_data[i*15+7] = 0.0f;
+		circle_data[i*15+8] = 1.0f;
+		circle_data[i*15+9] = 0.0f;
+
+		// C
+
+		circle_data[i*15+10] = cos(b)*0.5 - 0.5;
+		circle_data[i*15+11] = sin(b)*0.5 - 0.5;
+		circle_data[i*15+12] = 0.0f;
+		circle_data[i*15+13] = 1.0f;
+		circle_data[i*15+14] = 0.0f;
+
+		printf("Segment: %d\n", i);
+	}
+	
+	glGenBuffers(1, &state->hexagon);
+	glBindBuffer(GL_ARRAY_BUFFER, state->hexagon);
+	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat) * 15, circle_data, GL_STATIC_DRAW);
+
+
 	free(circle_data);
 
 	// Locate Attributes
@@ -210,6 +259,29 @@ static void draw_triangles(GLOBAL_T *state) {
     );
 
     glDrawArrays(GL_TRIANGLES, 0, 3 * 10);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, state->hexagon);
+	glUseProgram ( state->program );
+
+    glVertexAttribPointer(
+        state->attr_coord,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        0
+    );
+
+    glVertexAttribPointer(
+        state->attr_color,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        (void*)(sizeof(float) * 2)
+    );
+
+    glDrawArrays(GL_TRIANGLES, 0, 3 * 6);
 
 	glFlush();
 	glFinish();
