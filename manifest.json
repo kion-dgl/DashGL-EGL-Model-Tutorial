@@ -5,7 +5,7 @@
   "language" : "c",
   "window_library" : "egl",
   "graphics_library" : "opengl 2.0",
-  "title" : "Gtk Brickout",
+  "title" : "EGL Model",
   "repository" : "https://github.com/kion-dgl/DashGL-EGL-Model-Tutorial",
   "card-image" : "https://repository-images.githubusercontent.com/394214934/189147e5-da57-4a2d-81cf-34f7aea792a4",
   "support" : {
