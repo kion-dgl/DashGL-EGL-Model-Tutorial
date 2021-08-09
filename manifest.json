@@ -1,0 +1,24 @@
+{
+  "nickname" : "Kion",
+  "author" : "Benjamin Collins",
+  "email" : "kion@dashgl.com",
+  "language" : "c",
+  "window_library" : "egl",
+  "graphics_library" : "opengl 2.0",
+  "title" : "Gtk Brickout",
+  "repository" : "https://github.com/kion-dgl/DashGL-EGL-Model-Tutorial",
+  "card-image" : "https://repository-images.githubusercontent.com/394214934/189147e5-da57-4a2d-81cf-34f7aea792a4",
+  "support" : {
+    "liberapay" : "https://en.liberapay.com/DashGLProject/",
+    "patron" : "https://www.patreon.com/dashkion",
+    "ko-fi" : "https://ko-fi.com/dashgl0937"
+  },
+  "social" : {
+    "mastodon" : "https://linuxrocks.online/@kion",
+    "twitter" : "https://twitter.com/kion_dgl",
+    "reddit" : "https://www.reddit.com/user/kion_dgl"
+  },
+  "lessons" : [
+
+  ]
+}
