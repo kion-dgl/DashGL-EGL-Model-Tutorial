@@ -19,6 +19,82 @@
     "reddit" : "https://www.reddit.com/user/kion_dgl"
   },
   "lessons" : [
-
+    {
+      "index" : 0,
+      "title" : "Introduction",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 1,
+      "title" : "Blue Triangle",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 2,
+      "title" : "Red Square",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 3,
+      "title" : "Green Circle",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 4,
+      "title" : "Fragment Shader",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 5,
+      "title" : "Multiple Shapes",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 6,
+      "title" : "Fade in and Out",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 7,
+      "title" : "Transform Triangle",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 8,
+      "title" : "Draw a Cube",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 9,
+      "title" : "Textured Cube",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
+    {
+      "index" : 10,
+      "title" : "Render Model",
+      "readme" : "",
+      "source" :  "",
+      "featured-image" : ""
+    },
   ]
 }
