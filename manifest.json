@@ -22,77 +22,77 @@
     {
       "index" : 0,
       "title" : "Introduction",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 1,
       "title" : "Blue Triangle",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/01_triangle/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 2,
       "title" : "Red Square",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/02_square/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 3,
       "title" : "Green Circle",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/03_circle/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 4,
       "title" : "Fragment Shader",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/04_color/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 5,
       "title" : "Multiple Shapes",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/05_multiple/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 6,
       "title" : "Fade in and Out",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/06_fade/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 7,
       "title" : "Transform Triangle",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/07_transform/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 8,
       "title" : "Draw a Cube",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/08_cube/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 9,
       "title" : "Textured Cube",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/09_texture_cube/README.md",
       "source" :  "",
       "featured-image" : ""
     },
     {
       "index" : 10,
       "title" : "Render Model",
-      "readme" : "",
+      "readme" : "https://raw.githubusercontent.com/kion-dgl/DashGL-EGL-Model-Tutorial/master/10_dashie/README.md",
       "source" :  "",
       "featured-image" : ""
     },
