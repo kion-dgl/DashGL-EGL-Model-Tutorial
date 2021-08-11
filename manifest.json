@@ -2,6 +2,7 @@
   "nickname" : "Kion",
   "author" : "Benjamin Collins",
   "email" : "kion@dashgl.com",
+  "avatar" : "https://avatars.githubusercontent.com/u/25621780",
   "language" : "c",
   "window_library" : "egl",
   "graphics_library" : "opengl 2.0",
