@@ -1,5 +1,5 @@
 {
-  "id" : 3,
+  "serial" : 3,
   "description" : "In this tutorial we use EGL to render everything from the command line without starting a window environment. We start with a few basic primitives and work our way up to rendering a simple 3d model",
   "nickname" : "Kion",
   "author" : "Benjamin Collins",
